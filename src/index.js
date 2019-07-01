@@ -30,7 +30,7 @@ function addQuotes(json) {
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({
                     quoteId: quote.id,
-                    createdAt: new Date()
+                    createdAt: Date.now()
                 })
             })
             .then(resp => resp.json())
