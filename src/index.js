@@ -22,7 +22,20 @@ function addQuotes(json) {
 
         const likeBtn = document.createElement("button")
         likeBtn.className = "btn-success"
-        likeBtn.innerHTML = `Likes: <span>0</span>`
+        showLikes(likeBtn, quote.id)
+
+        likeBtn.addEventListener('click', e => {
+            fetch(`http://localhost:3000/likes`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    quoteId: quote.id,
+                    createdAt: new Date()
+                })
+            })
+            .then(resp => resp.json())
+            .then(json => showLikes(likeBtn, quote.id))
+        })
         newBlockQuote.appendChild(likeBtn)
 
         const deleteBtn = document.createElement("button")
@@ -46,11 +59,20 @@ function addQuotes(json) {
 
 
 newQuoteForm.addEventListener('submit', e=> {
-    fetch("https://localhost:3000/quotes", {
+    fetch("http://localhost:3000/quotes", {
         method: "POST",
         headers: {"Content-Type": "application/json"},
         body: JSON.stringify({quote: newQuote.value, author: author.value})
     })
-    .then(resp => console.log("HI"))
-    //.then(json => console.log(json))
+    .then(resp => resp.json())
+    .then(json => addQuotes(json))
 })
+
+function showLikes(likeBtn, quoteId) {
+    let length = 0
+    fetch(`http://localhost:3000/likes/?quoteId=${quoteId}`)
+    .then(resp => resp.json())
+    .then(json => {
+        likeBtn.innerHTML = `Likes: <span>${json.length}</span>`
+    })
+}
